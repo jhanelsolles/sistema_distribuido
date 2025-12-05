@@ -48,3 +48,7 @@ android/local.properties
 
 # Web
 
+# Firebase / Secrets
+android/app/google-services.json
+web/firebase-messaging-sw.js
+ios/Runner/GoogleService-Info.plist
