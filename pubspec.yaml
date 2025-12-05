@@ -38,6 +38,8 @@ dependencies:
   firebase_messaging: ^16.0.4
   provider: ^6.1.5+1
   http: ^1.6.0
+  google_fonts: ^6.3.3
+  flutter_local_notifications: ^19.5.0
 
 dev_dependencies:
   flutter_test:

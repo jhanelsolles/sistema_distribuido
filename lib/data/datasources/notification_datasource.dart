@@ -1,5 +1,6 @@
 
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'dart:developer' as developer;
 
 import '../../domain/entities/notification.dart' as app_notification;
@@ -21,32 +22,46 @@ class NotificationDatasourceImpl implements NotificationDatasource {
 
   @override
   Future<void> sendPushNotification(User user, app_notification.Notification notification) async {
-    // This simulates calling your Django backend to send a push notification.
-    // Your backend would then use the Firebase Admin SDK to send the message to the user's fcmToken.
-    developer.log("Simulating sending PUSH notification to ${user.name} via Django backend.", name: 'notification.datasource');
-    developer.log("Title: ${notification.title}, Body: ${notification.body}", name: 'notification.datasource');
+    // DIRECT FCM IMPLEMENTATION (FOR TESTING ONLY)
+    // WARNING: Do not use this in production. Your Server Key should be kept secret on your backend.
+    
+    // TODO: Replace with your actual Server Key from Firebase Console -> Project Settings -> Cloud Messaging
+    const String serverKey = "YOUR_SERVER_KEY_HERE"; 
 
-    /*
-    // Example of a real implementation:
+    if (serverKey == "YOUR_SERVER_KEY_HERE") {
+      developer.log("Error: Server Key not set.", name: 'notification.datasource');
+      throw Exception('Please set your Firebase Server Key in notification_datasource.dart');
+    }
+
+    final endpoint = "https://fcm.googleapis.com/fcm/send";
+
     try {
       final response = await client.post(
-        Uri.parse(_sendPushEndpoint),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse(endpoint),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'key=$serverKey',
+        },
         body: json.encode({
-          'fcm_token': user.fcmToken,
-          'title': notification.title,
-          'body': notification.body,
+          'to': user.fcmToken,
+          'notification': {
+            'title': notification.title,
+            'body': notification.body,
+          },
+          'priority': 'high',
         }),
       );
 
-      if (response.statusCode != 200) {
-        throw Exception('Failed to send push notification');
+      if (response.statusCode == 200) {
+        developer.log("Push notification sent successfully!", name: 'notification.datasource');
+      } else {
+        developer.log("Failed to send push notification: ${response.body}", name: 'notification.datasource');
+        throw Exception('Failed to send push notification: ${response.statusCode}');
       }
     } catch (e) {
       developer.log("Error sending push notification: $e", name: 'notification.datasource', error: e);
       throw Exception('Failed to send push notification');
     }
-    */
   }
 
   @override
